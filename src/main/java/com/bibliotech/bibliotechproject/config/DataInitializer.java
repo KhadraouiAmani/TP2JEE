@@ -13,9 +13,11 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initUsers(UserRepository userRepository, PasswordEncoder encoder) {
         return args -> {
-            userRepository.findByUsername("admin")
-                    .switchIfEmpty(userRepository.save(new User(null, "admin", encoder.encode("admin123"), Set.of("ROLE_ADMIN"))))
-                    .subscribe();
+            // We delete everything first to ensure no duplicates
+            userRepository.deleteAll()
+                    .then(userRepository.save(new User(null, "admin", encoder.encode("admin123"), Set.of("ROLE_ADMIN"))))
+                    .then(userRepository.save(new User(null, "member1", encoder.encode("pass123"), Set.of("ROLE_USER"))))
+                    .subscribe(user -> System.out.println("DEBUG: Created user: " + user.getUsername()));
         };
     }
 }

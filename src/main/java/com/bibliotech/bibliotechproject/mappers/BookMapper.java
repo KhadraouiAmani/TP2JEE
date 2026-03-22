@@ -4,15 +4,14 @@ import com.bibliotech.bibliotechproject.dtos.BookDTO;
 import com.bibliotech.bibliotechproject.models.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface BookMapper {
-    BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
 
-    // We convert the Book entity to the DTO
+    // We ignore authorName and categoryNames because they come from different collections
+    @Mapping(target = "authorName", ignore = true)
+    @Mapping(target = "categoryNames", ignore = true)
     BookDTO toDto(Book book);
 
-    // We convert the DTO back to the Entity
     Book toEntity(BookDTO dto);
 }
