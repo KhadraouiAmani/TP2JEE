@@ -1,5 +1,6 @@
 package com.bibliotech.bibliotechproject.security;
 
+import com.bibliotech.bibliotechproject.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -10,11 +11,13 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtAuthenticationFilter implements WebFilter {
+
     @Autowired private JwtUtil jwtUtil;
+    @Autowired private UserRepository userRepository; // Now we look at the DB!
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -22,14 +25,25 @@ public class JwtAuthenticationFilter implements WebFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            String username = jwtUtil.getUsernameFromToken(token);
+            try {
+                String username = jwtUtil.getUsernameFromToken(token);
 
-            // For this TP, we assume the user has a role. In a real app, you'd load it from DB.
-            UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    username, null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
+                // REAL SECURITY: Fetch the user from DB to get their actual roles
+                return userRepository.findByUsername(username)
+                        .flatMap(user -> {
+                            var authorities = user.getRoles().stream()
+                                    .map(SimpleGrantedAuthority::new)
+                                    .collect(Collectors.toList());
 
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                            UsernamePasswordAuthenticationToken auth =
+                                    new UsernamePasswordAuthenticationToken(username, null, authorities);
+
+                            return chain.filter(exchange)
+                                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(auth));
+                        });
+            } catch (Exception e) {
+                return chain.filter(exchange);
+            }
         }
         return chain.filter(exchange);
     }
