@@ -22,3 +22,4 @@ public class Borrowing {
     // Utilise l'Enum créé au début (ONGOING, RETURNED, OVERDUE)
     private BorrowingStatus status;
 }
+

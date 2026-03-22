@@ -10,4 +10,5 @@ public class BookDTO {
     private String title;
     private int stockDisponible;
     private String authorName; // Cleaner: just the name of the author
+    private List<String> categoryNames;
 }

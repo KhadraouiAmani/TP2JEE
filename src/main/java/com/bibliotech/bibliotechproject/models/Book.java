@@ -24,3 +24,6 @@ public class Book {
     // On stocke une liste d'IDs de catégories (Relation Many-to-Many)
     private List<String> categoryIds;
 }
+
+
+
