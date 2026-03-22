@@ -13,4 +13,8 @@ public class User {
     private String username;
     private String password; // Will be encoded
     private Set<String> roles; // e.g., "ROLE_ADMIN", "ROLE_USER"
+
+    public User(Object o, String username, String password, Set<String> roles) {
+
+    }
 }
