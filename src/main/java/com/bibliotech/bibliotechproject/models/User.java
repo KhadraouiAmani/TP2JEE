@@ -18,3 +18,4 @@ public class User {
     private String password;
     private Set<String> roles;
 }
+

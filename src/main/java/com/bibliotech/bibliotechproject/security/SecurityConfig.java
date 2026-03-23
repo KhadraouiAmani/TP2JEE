@@ -24,6 +24,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.POST, "/api/v1/books/**").hasRole("ADMIN") // Only Admin can add books
                         .pathMatchers(HttpMethod.DELETE, "/api/v1/books/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.PUT, "/api/v1/books/**").hasRole("ADMIN")
                         .anyExchange().permitAll() // Allow others to read
                 )
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)

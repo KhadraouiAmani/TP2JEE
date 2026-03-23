@@ -12,3 +12,4 @@ public interface BookRepository extends ReactiveMongoRepository<Book, String> {
     // Ça renvoie un Mono (un ticket pour un livre)
     Mono<Book> findByIsbn(String isbn);
 }
+
