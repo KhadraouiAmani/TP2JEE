@@ -11,7 +11,6 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 @Service // Dit à Spring : "C'est ici que se trouve la logique métier"
 public class BookService {
-
     @Autowired // Spring va chercher le "Bibliothécaire" (Repository) tout seul
     private BookRepository bookRepository;
     @Autowired private AuthorRepository authorRepository;
@@ -59,5 +58,22 @@ public class BookService {
         return categoryRepository.findAllById(categoryIds)
                 .map(cat -> cat.getLabel())
                 .collectList();
+    }
+
+    //  Supprimer un livre par son ID
+    public Mono<Void> deleteBook(String id) {
+        return bookRepository.deleteById(id);
+    }
+
+    //  Mettre à jour un livre existant
+    public Mono<Book> updateBook(String id, Book bookDetails) {
+        return bookRepository.findById(id) // On cherche d'abord si le livre existe
+                .flatMap(existingBook -> {
+                    // On met à jour les champs
+                    existingBook.setTitle(bookDetails.getTitle());
+                    existingBook.setIsbn(bookDetails.getIsbn());
+                    existingBook.setStockDisponible(bookDetails.getStockDisponible());
+                    return bookRepository.save(existingBook); // On sauvegarde les changements
+                });
     }
 }
